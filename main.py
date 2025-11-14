@@ -63,15 +63,16 @@ def main():
             ans = input("Continue?")
             if 'no' in ans.lower():
                 return 0
+    if mode == 2:
+        while choised_list:
+            theme = choice(choised_list)
+            choised_list.remove(theme)
 
-    while choised_list:
-        theme = choice(choised_list)
-        choised_list.remove(theme)
-
-        print(theme)
-        ans = input("Continue?")
-        if 'no' in ans.lower():
-            return 0
+            print(theme)
+            ans = input("Continue?")
+            if 'no' in ans.lower():
+                return 0
+        return 0
     print("Wrong mode")
     return 1
 
