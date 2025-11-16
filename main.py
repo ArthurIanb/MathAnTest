@@ -1,5 +1,5 @@
 from models import Theme
-from random import choice
+from random import choice, shuffle
 import sys
 
 
@@ -20,61 +20,61 @@ with open('test.txt') as f:
                 theme.set_theme(theme.maintheme + '\n' + stripped[:len(stripped)-1])
         themes.append(theme)
 
-def main():
-    
-    if len(sys.argv) < 2:
-        return 1
-    start = 0
-    end = len(themes)
-    mode = 0
-    if sys.argv[1] == 'help':
-        print("py main.py [mode] [start] [end]\nmode = \n\t1: Dont shuffle\n\t2: Shuffle\n\nQuestions in [start:end]")
-        return 0
-    print("py main.py help -- for help")
-    if len(sys.argv) == 4:
-        try:
-            mode = int(sys.argv[1])
-            start = int(sys.argv[2])
-            end = int(sys.argv[3])
-            if end > len(themes):
-                raise ImportError
-        except ImportError:
-            print("End is too big")
-            return 1
-        except:
-            print("Wrong format")
-            return 1
-    if len(sys.argv) == 2:
-        try:
-            mode = int(sys.argv[1])
-        except:
-            print("Wrong mode")
-            return 1
-    if len(sys.argv) != 2 and (len(sys.argv)) != 4:
-        print("Wrong format")
-        return 1
-    choised_list = themes.copy()[start:end]
-    if mode not in MODES:
-        print("Wrong mode")
-        return 1
-    if mode == 1:
-        for i in choised_list:
-            print(i)
-            ans = input("Continue?")
-            if 'no' in ans.lower():
-                return 0
-    if mode == 2:
-        while choised_list:
-            theme = choice(choised_list)
-            choised_list.remove(theme)
 
-            print(theme)
-            ans = input("Continue?")
-            if 'no' in ans.lower():
-                return 0
+def play(themes: list[Theme]):
+    work_theme = themes.copy()
+    while work_theme:
+        i = work_theme[0]
+        print(i)
+        work_theme.pop(0)
+        if('no' in input("Continue")):
+            return 0
+
+def parse_args(args: list[str]):
+    start, end = 0, len(themes)
+    count = 0
+    if len(args) == 0:
+        return 1
+    mode = int(args[0])
+
+    if len(args) == 1:
+        end = len(themes)
+        count = end - start
+    if len(args) == 2:
+        count = int(args[1])
+    if len(args) == 3:
+        start = int(args[1])
+        end = int(args[2])
+    if len(args) == 4:
+        start = int(args[1])
+        end = int(args[2])
+        count = int(args[3])
+    return mode, start, end, count
+
+
+def check_args(mode, start, end, count):
+    if mode not in [1, 2, 3]:
+        return False
+    if start < 0 or end > len(themes):
+        return False
+    if count > len(themes):
+        return False
+    return True
+
+def main():
+    mode, start, end, count = parse_args(sys.argv[1:])
+    if not check_args(mode, start, end, count):
         return 0
-    print("Wrong mode")
-    return 1
+    choised_list = themes.copy()[start-1:end]
+    if mode == 1:
+        return play(choised_list)
+    if mode == 2:
+        shuffle(choised_list)
+        return play(choised_list)
+    if mode == 3:
+        shuffle(choised_list)
+        return play(choised_list[:count])
+    return "Unreachable"
 
 if __name__ == "__main__":
     main()
